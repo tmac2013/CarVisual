@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                        http://www.springframework.org/schema/websocket
+                        http://www.springframework.org/schema/websocket/spring-websocket-4.3.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                        http://www.springframework.org/schema/mvc
+                        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+    <!--<websocket:handlers>-->
+        <!--<websocket:mapping path="/carsocket" handler="carWebSocketHandler"/>-->
+    <!--</websocket:handlers>-->
+    <!--<bean id="carWebSocketHandler" class="CarVisual.handler.CarWebSocketHandler"/>-->
+    <context:annotation-config />
+    <!-- 自动扫描java文件，有Spring注解的类则注册为Spring的bean -->
+    <context:component-scan base-package="CarVisual" />
+    <!-- 加载数据源参数 -->
+    <context:property-override location="classpath:jdbc.properties"/>
+    <!-- 配置C3P0数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"/>
+    <!-- mybatis整合Spring-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" p:dataSource-ref="dataSource"/>
+    <!-- JDBC事务管理-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource"/>
+    <!--启用支持注解方式的事务管理-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!-- 扫描mapper-->
+    <mybatis:scan base-package="CarVisual.mapper"/>
+</beans>
