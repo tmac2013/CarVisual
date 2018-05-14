@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class PageController {
 	private static final Log logger = LogFactory.getLog(PageController.class);
-	@RequestMapping(value = "/testsocket")
+	@RequestMapping(value = "/welcome")
 	public String pageShow(){
 		logger.info("PageController used!");
-		return "testsocket";
+		return "welcome";
 	}
 }

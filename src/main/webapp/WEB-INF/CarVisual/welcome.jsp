@@ -14,10 +14,19 @@
 <body>
 <div id="allmap"></div>
 <div id="location">
+    <button id="forward">前进</button>
 </div>
 </body>
 </html>
 <script src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#forward").click(
+            function(){
+            $.get("${pageContext.request.contextPath}/websocket/forward");});
+    });
+
+</script>
 <script type="text/javascript">
     // 百度地图API功能
     var map = new BMap.Map("allmap");
