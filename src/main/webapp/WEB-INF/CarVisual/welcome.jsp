@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -13,8 +12,11 @@
 </head>
 <body>
 <div id="allmap"></div>
-<div id="location">
-    <button id="forward">前进</button>
+<div id="parameters" style="height:300px">
+    <div id="status" style=" height: 300px; width:300px;float:left">status:Disconnecting</div>
+    <div id="control" style=" height: 300px; width:300px;float:left">
+        <button id="forward">forward</button>
+    </div>
 </div>
 </body>
 </html>
@@ -23,7 +25,9 @@
     $(document).ready(function(){
         $("#forward").click(
             function(){
-            $.get("${pageContext.request.contextPath}/websocket/forward");});
+                $.get("${pageContext.request.contextPath}/websocket/forward");
+                //console.log("send forward!")
+                });
     });
 
 </script>
@@ -33,9 +37,13 @@
     map.centerAndZoom(new BMap.Point(116.331398,39.897445),11);
     map.enableScrollWheelZoom(true);
 
+    var car_longitude="";
+    var car_latitude="";
+    var car_connect="Disconnecting";
+    var car_marker;
+
     //jquery实现AJAX
     function ink(){
-
         $.ajax({
             type:"post",
             async:true,
@@ -44,33 +52,41 @@
             data: "json",
             success:function(data){
                 //document.getElementById("location").innerHTML=data.longitude+" "+data.latitude;
-                if(data.longitude!=""&&data.latitude!=""){
+                if(data.longitude!=car_longitude||data.latitude!=car_latitude){
+                    car_latitude=data.latitude;
+                    car_longitude=data.longitude;
                     var point = new BMap.Point(data.longitude,data.latitude);
                     var marker = new BMap.Marker(point);
 
                     var convertor = new BMap.Convertor();
                     var pointArr = [];
                     pointArr.push(point);
-                    convertor.translate(pointArr, 1, 5, translateCallback);
+                    convertor.translate(pointArr, 1, 5, translateCallback);//坐标转换
                 }
 
-
-
+                if(data.connect!=car_connect){
+                    car_connect=data.connect;
+                    document.getElementById("status").innerHTML="status:"+data.connect;
+                }
             }
-        });
-
+        });//坐标更新
     }
     $(function(){setInterval("ink()",1000);});
 
-
     translateCallback = function (data){
         if(data.status === 0) {
-            var new_marker = new BMap.Marker(data.points[0]);
+            map.removeOverlay(car_marker);
+            car_marker = new BMap.Marker(data.points[0]);
             map.centerAndZoom(data.points[0],18);
-            map.clearOverlays();
-            map.addOverlay(new_marker);
+            map.addOverlay(car_marker);
         }
-    }
+    }//坐标转换回调函数
 
+    function showInfo(e){
+        car_marker = new BMap.Marker(e.point);  // 创建标注
+        map.addOverlay(car_marker);
+        $.get("${pageContext.request.contextPath}/websocket/destination?"+"longitude="+e.point.lng+"&latitude="+e.point.lat);
+    }
+    map.addEventListener("click", showInfo);
 
 </script>

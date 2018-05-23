@@ -7,7 +7,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +43,14 @@ public class CarWebSocketHandler extends AbstractWebSocketHandler {
 
 	public void SendMessageToCar(String command) throws Exception{
 		carsession.get(0).sendMessage(new TextMessage(command));
+	}
+	public String CheckConnect(){
+		if(carsession.isEmpty()){
+			return "Disconnecting";
+		}
+		else {
+			return "Connecting";
+		}
 	}
 
 }

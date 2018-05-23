@@ -23,11 +23,14 @@ public class CarVisualController {
 	}
 	@RequestMapping(value = "/welcome",method = RequestMethod.POST)
 	@ResponseBody
-	public JSONObject pageShow(Model model){
+	public JSONObject pageShow(){
 		//logger.info("PageShowController used!");
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("longitude",carLocation.getLongitude());
 		jsonObject.put("latitude",carLocation.getLatitude());
+
+		jsonObject.put("connect",infoHandler().CheckConnect());
+        //logger.info(infoHandler().CheckConnect());
 		return jsonObject;
 	}
 	@RequestMapping(value="/car",method = RequestMethod.POST)
@@ -42,7 +45,15 @@ public class CarVisualController {
 	}
 	@RequestMapping("/websocket/forward")
 	@ResponseBody
-	public void send() throws Exception {
+	public void sendForward() throws Exception {
 		infoHandler().SendMessageToCar("forward");
 	}
+
+	@RequestMapping("/websocket/destination")
+	@ResponseBody
+	public void sendLocation(@RequestParam("longitude") String longitude,@RequestParam("latitude") String latitude) throws Exception {
+		infoHandler().SendMessageToCar("longitude:"+longitude+" latitude:"+latitude);
+		logger.info("longitude:"+longitude+" latitude:"+latitude);
+	}
+
 }
