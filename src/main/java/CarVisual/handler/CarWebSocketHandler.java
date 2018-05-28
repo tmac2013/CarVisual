@@ -28,7 +28,6 @@ public class CarWebSocketHandler extends AbstractWebSocketHandler {
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		logger.info("Recieved message:"+message.getPayload());
-		session.sendMessage(new TextMessage("Recieved "+message.getPayload()));
 	}
 
 	@Override

@@ -14,9 +14,9 @@ public class PageController {
 		logger.info("PageController1 used!");
 		return "welcome";
 	}
-	@RequestMapping(value = "/robot",method = RequestMethod.GET)
+	@RequestMapping(value = "/test",method = RequestMethod.GET)
 	public String pageShow2(){
 		logger.info("PageController2 used!");
-		return "robot";
+		return "test";
 	}
 }
