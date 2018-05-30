@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.concurrent.TimeUnit;
+
 @Controller
 public class CarVisualController {
 	private static final Log logger = LogFactory.getLog(CarVisualController.class);
@@ -43,6 +46,7 @@ public class CarVisualController {
 		model.addObject("carlocation",carLocation);
 		return model;
 	}
+
 	@RequestMapping("/websocket/forward")
 	@ResponseBody
 	public void sendForward() throws Exception {
@@ -52,8 +56,15 @@ public class CarVisualController {
 	@RequestMapping("/websocket/destination")
 	@ResponseBody
 	public void sendLocation(@RequestParam("longitude") String longitude,@RequestParam("latitude") String latitude) throws Exception {
-		infoHandler().SendMessageToCar("longitude:"+longitude+" latitude:"+latitude);
+		infoHandler().SendMessageToCar(longitude+","+latitude);
 		logger.info("longitude:"+longitude+" latitude:"+latitude);
+	}
+
+	@RequestMapping("/websocket/check")
+	@ResponseBody
+	public void checkRecv() throws Exception{
+		logger.info("CheckRecv!");
+		infoHandler().CheckRecieve();
 	}
 
 }

@@ -60,4 +60,4 @@ public class CarPOST {
 		String s1 = CarPOST.sendPost("http://localhost:8080/CarVisual/car", "longitude=116.35308063977706&latitude=39.95960033184773");
 		System.out.println(s1);
 	}
-}  
+}   

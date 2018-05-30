@@ -5,8 +5,4 @@
 </body>
 </html>
 <script>
-    var a;
-    if(a==null){
-        alert("null");
-    }
 </script>

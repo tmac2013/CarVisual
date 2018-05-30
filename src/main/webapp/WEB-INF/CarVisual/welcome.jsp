@@ -59,18 +59,27 @@
                 if(data.connect!=car_connect){
                     car_connect=data.connect;
                     document.getElementById("status").innerHTML="status:"+data.connect;
+                    if(data.connect=="Disconnecting"){
+                        alert("Car is disconnecting!");
+                    }
                 }
                 if (car_connect=="Connecting"){
                     if(data.longitude!=car_longitude||data.latitude!=car_latitude){
                         car_latitude=data.latitude;
                         car_longitude=data.longitude;
-                        var point = new BMap.Point(data.longitude,data.latitude);
-                        var marker = new BMap.Marker(point);
-                        var convertor = new BMap.Convertor();
-                        var pointArr = [];
-                        pointArr.push(point);
-                        convertor.translate(pointArr, 1, 5, translateCallback);//坐标转换
+                        if (data.longitude==""||data.latitude==""||data.longitude=="nan"||data.latitude=="nan"){}
+                        else{
+                            var point = new BMap.Point(data.longitude,data.latitude);
+                            var marker = new BMap.Marker(point);
+                            var convertor = new BMap.Convertor();
+                            var pointArr = [];
+                            pointArr.push(point);
+                            convertor.translate(pointArr, 1, 5, translateCallback);//坐标转换
+                        };
+
                     }
+                }else{
+                    map.clearOverlays();
                 }
 
             }
@@ -82,7 +91,7 @@
         if(data.status === 0) {
             map.removeOverlay(car_marker);
             car_marker = new BMap.Marker(data.points[0],{icon:myIcon});
-            map.centerAndZoom(data.points[0],18);
+            map.centerAndZoom(data.points[0],19);
             map.addOverlay(car_marker);
             if (car_point!=null){
                 var polyline = new BMap.Polyline([
@@ -106,6 +115,7 @@
             );
             var pointconvertor = result.toString().split(",");
             $.get("${pageContext.request.contextPath}/websocket/destination?"+"longitude="+pointconvertor[0]+"&latitude="+pointconvertor[1]);
+            setTimeout("$.get(\"${pageContext.request.contextPath}/websocket/check\")",30000)
         }else {
             alert("Car is disconnecting!")
         }
