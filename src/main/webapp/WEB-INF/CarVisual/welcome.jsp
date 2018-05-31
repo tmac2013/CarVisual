@@ -2,22 +2,30 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-        body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
-        #allmap{height:500px;width:100%;}
-        #r-result{width:100%; font-size:14px;}
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/default.css">
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=zVOjktctX9WDxQtM96W8KCMdYK7UgBek"></script>
-    <title>Location</title>
+    <title>Driverless Car Viusal System</title>
 </head>
 <body>
-<div id="allmap"></div>
-<div id="parameters" style="height:300px">
-    <div id="status" style=" height: 300px; width:300px;float:left">status:Disconnecting</div>
-    <div id="control" style=" height: 300px; width:300px;float:left">
-        <button id="forward">forward</button>
-    </div>
+<div id="header">
+    <h1>Driverless Car Viusal System</h1>
 </div>
+
+<div id="nav">
+    London<br>
+    Paris<br>
+    Tokyo<br>
+</div>
+
+<div id="content">
+    <div id="allmap"></div>
+
+    <div id="video">video</div>
+
+    <div id="status">status:Disconnecting</div>
+</div>
+
+
 </body>
 </html>
 <script src="js/jquery-1.11.2.min.js"></script>
