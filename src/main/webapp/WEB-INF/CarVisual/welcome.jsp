@@ -1,45 +1,73 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/default.css">
+    <script src="js/jquery-1.11.2.min.js"></script>
+    <script src="https://unpkg.com/gcoord/dist/gcoord.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=zVOjktctX9WDxQtM96W8KCMdYK7UgBek"></script>
     <title>Driverless Car Viusal System</title>
 </head>
 <body>
-<div id="header">
-    <h1>Driverless Car Viusal System</h1>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="page-header">
+                <h1>
+                    Driverless Car Visual System <small>无人车巡检可视化系统</small>
+                </h1>
+            </div>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-2 column">
+            <h3>
+                路径生成模块
+            </h3>
+            <p>
+                选择“选取坐标点”按钮，鼠标在图上点击以选取目标路径点<br>
+                选择“生成路径”按钮，生成巡检路径。
+            </p>
+            <button type="button" id="selectgps"  onclick="selectgps()" class="btn btn-default btn-primary btn-block">选取坐标点</button>
+            <button type="button" id="newroute" class="btn btn-default btn-block btn-primary">生成路径</button>
+        </div>
+        <div class="col-md-6 column" id="allmap">
+        </div>
+        <div class="col-md-4 column">
+            <div class="row clearfix">
+                <div class="col-md-12 column" id="video">video
+                </div>
+            </div>
+            <div class="row clearfix">
+                <div class="col-md-12 column" id="status"><h3>status：Disconnecting</h3>
+                </div>
+            </div>
+            <div class="row clearfix">
+                <div class="col-md-12 column" id="longitude"><h3>longitude：</h3>
+                </div>
+            </div>
+            <div class="row clearfix">
+                <div class="col-md-12 column" id="latitude"><h3>latitude：</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <div class="alert alert-success alert-dismissable" id="alert">
+                <h4>
+                    Welcome to Driverless Car Visual System!
+                </h4>
+                <strong>欢迎进入无人车巡检可视化系统！</strong>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div id="nav">
-    London<br>
-    Paris<br>
-    Tokyo<br>
-</div>
-
-<div id="content">
-    <div id="allmap"></div>
-
-    <div id="video">video</div>
-
-    <div id="status">status:Disconnecting</div>
-</div>
-
-
 </body>
 </html>
-<script src="js/jquery-1.11.2.min.js"></script>
-<script src="https://unpkg.com/gcoord/dist/gcoord.js"></script>
-<script type="text/javascript">
-    $(document).ready(function(){
-        $("#forward").click(
-            function(){
-                $.get("${pageContext.request.contextPath}/websocket/forward");
-                //console.log("send forward!")
-                });
-    });
-
-</script>
 <script type="text/javascript">
     // 百度地图API功能
     var map = new BMap.Map("allmap");
@@ -52,8 +80,6 @@
     var car_connect="Disconnecting";
     var car_marker;
     var car_point;
-
-
     //jquery实现AJAX
     function ink(){
         $.ajax({
@@ -66,9 +92,11 @@
                 //document.getElementById("location").innerHTML=data.longitude+" "+data.latitude;
                 if(data.connect!=car_connect){
                     car_connect=data.connect;
-                    document.getElementById("status").innerHTML="status:"+data.connect;
                     if(data.connect=="Disconnecting"){
-                        alert("Car is disconnecting!");
+                        document.getElementById("alert").innerHTML="<h4>Driverless car is disconnecting! </h4> <strong>无人车连接已断开！</strong>"
+                        $.post("${pageContext.request.contextPath}/car",{longitude:"",latitude:""})
+                    }else{
+                        document.getElementById("alert").innerHTML="<h4>Driverless car is successfully connecting! </h4> <strong>无人车已成功连接！</strong>"
                     }
                 }
                 if (car_connect=="Connecting"){
@@ -87,8 +115,13 @@
 
                     }
                 }else{
+                    car_longitude="";
+                    car_latitude="";
                     map.clearOverlays();
                 }
+                document.getElementById("status").innerHTML="<h3>status:"+car_connect+"</h3>";
+                document.getElementById("longitude").innerHTML="<h3>longitude:"+car_longitude+"</h3>";
+                document.getElementById("latitude").innerHTML="<h3>latitude:"+car_latitude+"</h3>";
 
             }
         });//坐标更新
@@ -125,10 +158,25 @@
             $.get("${pageContext.request.contextPath}/websocket/destination?"+"longitude="+pointconvertor[0]+"&latitude="+pointconvertor[1]);
             setTimeout("$.get(\"${pageContext.request.contextPath}/websocket/check\")",30000)
         }else {
-            alert("Car is disconnecting!")
+            document.getElementById("alert").innerHTML="<h4>Warnning:Driverless car is disconnecting! </h4> <strong>警告：无人车未连接！</strong>"
         }
 
     }
-    map.addEventListener("click", showInfo);
+    //map.addEventListener("click", showInfo);
+
+    // $(document).ready(function(){
+    //     $("#selectgps").click(
+    //         function(){
+    //             map.addEventListener("click", showInfo);
+    //         });
+    // });
+    function selectgps(){
+        if (car_longitude==""||car_latitude==""||car_longitude=="nan"||car_latitude=="nan"){
+            document.getElementById("alert").innerHTML="<h4>No GPS location information! </h4> <strong>警告：未获取无人车GPS定位信息！</strong>"
+        }
+        else{
+            map.addEventListener("click", showInfo);
+        }
+    }
 
 </script>

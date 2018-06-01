@@ -47,11 +47,6 @@ public class CarVisualController {
 		return model;
 	}
 
-	@RequestMapping("/websocket/forward")
-	@ResponseBody
-	public void sendForward() throws Exception {
-		infoHandler().SendMessageToCar("forward");
-	}
 
 	@RequestMapping("/websocket/destination")
 	@ResponseBody
