@@ -28,11 +28,14 @@
                 路径生成模块
             </h3>
             <p>
-                选择“选取坐标点”按钮，鼠标在图上点击以选取目标路径点<br>
+                选择“选取坐标点”按钮，鼠标在图上点击以选取目标路径点（最多可以选择10个）<br>
                 选择“生成路径”按钮，生成巡检路径。
+                选择“重新选取”按钮，清除之前选点重新进行选取。
             </p>
             <button type="button" id="selectgps"  onclick="selectgps()" class="btn btn-default btn-primary btn-block">选取坐标点</button>
-            <button type="button" id="newroute" class="btn btn-default btn-block btn-primary">生成路径</button>
+            <button type="button" id="newroute" onclick="newroute()" class="btn btn-default btn-block btn-primary">生成路径</button>
+            <button type="button" id="reselect" onclick="reselect()" class="btn btn-default btn-block btn-primary">重新选取</button>
+
         </div>
         <div class="col-md-6 column" id="allmap">
         </div>
@@ -80,7 +83,10 @@
     var car_connect="Disconnecting";
     var car_marker;
     var car_point;
-    //jquery实现AJAX
+    var route_points=[];
+    var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+
+    //jquery实现AJAX;
     function ink(){
         $.ajax({
             type:"post",
@@ -95,6 +101,8 @@
                     if(data.connect=="Disconnecting"){
                         document.getElementById("alert").innerHTML="<h4>Driverless car is disconnecting! </h4> <strong>无人车连接已断开！</strong>"
                         $.post("${pageContext.request.contextPath}/car",{longitude:"",latitude:""})
+                        document.getElementById("longitude").innerHTML="<h3>longitude:</h3>";
+                        document.getElementById("latitude").innerHTML="<h3>latitude:</h3>";
                     }else{
                         document.getElementById("alert").innerHTML="<h4>Driverless car is successfully connecting! </h4> <strong>无人车已成功连接！</strong>"
                     }
@@ -103,7 +111,8 @@
                     if(data.longitude!=car_longitude||data.latitude!=car_latitude){
                         car_latitude=data.latitude;
                         car_longitude=data.longitude;
-                        if (data.longitude==""||data.latitude==""||data.longitude=="nan"||data.latitude=="nan"){}
+                        if (data.longitude==""||data.latitude==""||data.longitude=="nan"||data.latitude=="nan"){
+                        }
                         else{
                             var point = new BMap.Point(data.longitude,data.latitude);
                             var marker = new BMap.Marker(point);
@@ -120,9 +129,6 @@
                     map.clearOverlays();
                 }
                 document.getElementById("status").innerHTML="<h3>status:"+car_connect+"</h3>";
-                document.getElementById("longitude").innerHTML="<h3>longitude:"+car_longitude+"</h3>";
-                document.getElementById("latitude").innerHTML="<h3>latitude:"+car_latitude+"</h3>";
-
             }
         });//坐标更新
     }
@@ -134,6 +140,8 @@
             car_marker = new BMap.Marker(data.points[0],{icon:myIcon});
             map.centerAndZoom(data.points[0],19);
             map.addOverlay(car_marker);
+            document.getElementById("longitude").innerHTML="<h3>longitude:"+data.points[0].lng+"</h3>";
+            document.getElementById("latitude").innerHTML="<h3>latitude:"+data.points[0].lat+"</h3>";
             if (car_point!=null){
                 var polyline = new BMap.Polyline([
                     car_point,
@@ -147,8 +155,9 @@
 
     function showInfo(e){
         if (car_connect=="Connecting"){
-            car_marker = new BMap.Marker(e.point);  // 创建标注
-            map.addOverlay(car_marker);
+            route_points.push(e.point)
+            route_marker = new BMap.Marker(e.point);// 创建标注
+            map.addOverlay(route_marker);
             var result = gcoord.transform(
                 [e.point.lng, e.point.lat ],    // 经纬度坐标
                 gcoord.BD09,                 // 当前坐标系
@@ -177,6 +186,24 @@
         else{
             map.addEventListener("click", showInfo);
         }
+    }
+    function newroute() {
+        var length  = route_points.length;
+        if(length==0){
+            document.getElementById("alert").innerHTML="<h4>No points selected! </h4> <strong>警告：坐标点未选取！</strong>"
+        }else if(length>10){
+            document.getElementById("alert").innerHTML="<h4>Total number of points is limited to 10! </h4> <strong>警告：坐标点总数不能超过十个！</strong>"
+        }else{
+            var destination_point = route_points[length-1];
+            var way_points=route_points.slice(0,length-1);
+            driving.search(car_point, destination_point,{waypoints:way_points});
+        }
+    }
+    function reselect() {
+        driving.clearResults();
+        map.clearOverlays();
+        map.addOverlay(car_marker);
+        route_points=[];
     }
 
 </script>
