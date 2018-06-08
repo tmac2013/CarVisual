@@ -11,25 +11,25 @@
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=zVOjktctX9WDxQtM96W8KCMdYK7UgBek"></script>
     <title>Driverless Car Viusal System</title>
 </head>
-<body>
-<div class="container">
-    <div class="row clearfix">
-        <div class="col-md-12 column">
-            <div class="page-header">
-                <h1>
+<body >
+<div class="container" style="width: 100%;height: 100%;background-image: url(image/back1.jpg);  background-repeat: no-repeat;background-size: 100% 100%;  ">
+    <div class="row clearfix"  >
+        <div class="col-md-12 column" style="background-image: url(image/back.jpg);  background-repeat: no-repeat;background-size: 100% 100%;  ">
+            <div class="page-header" id="title"  >
+                <h1 style="color: aliceblue">
                     Driverless Car Visual System <small>无人车巡检可视化系统</small>
                 </h1>
             </div>
         </div>
     </div>
     <div class="row clearfix">
-        <div class="col-md-2 column">
+        <div class="col-md-3 column">
             <h3>
                 路径生成模块
             </h3>
             <p>
                 选择“选取坐标点”按钮，鼠标在图上点击以选取目标路径点（最多可以选择10个）<br>
-                选择“生成路径”按钮，生成巡检路径。
+                选择“生成路径”按钮，生成巡检路径。<br>
                 选择“重新选取”按钮，清除之前选点重新进行选取。
             </p>
             <button type="button" id="selectgps"  onclick="selectgps()" class="btn btn-default btn-primary btn-block">选取坐标点</button>
@@ -39,7 +39,7 @@
         </div>
         <div class="col-md-6 column" id="allmap">
         </div>
-        <div class="col-md-4 column">
+        <div class="col-md-3 column">
             <div class="row clearfix">
                 <div class="col-md-12 column" id="video">video
                 </div>
@@ -60,6 +60,7 @@
     </div>
     <div class="row clearfix">
         <div class="col-md-12 column">
+            <br>
             <div class="alert alert-success alert-dismissable" id="alert">
                 <h4>
                     Welcome to Driverless Car Visual System!
@@ -84,7 +85,7 @@
     var car_marker;
     var car_point;
     var route_points=[];
-    var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+    var driving = new BMap.WalkingRoute(map, {renderOptions:{map: map, autoViewport: true}});
 
     //jquery实现AJAX;
     function ink(){

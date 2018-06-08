@@ -57,7 +57,7 @@ public class CarPOST {
 		//发送POST请求
 		String longitude[] = new String[] {"116.365961","116.365722","116.365242"};
 		String latitude[] = new String[] {"39.970326","39.970322","39.970295"};
-		String s1 = CarPOST.sendPost("http://localhost:8080/CarVisual/car", "longitude=116.35308063977706&latitude=39.95960033184773");
+		String s1 = CarPOST.sendPost("http://123.126.40.28:2221/CarVisual/car", "longitude=116.35308063977706&latitude=39.95960033184773");
 		System.out.println(s1);
 	}
 }   
