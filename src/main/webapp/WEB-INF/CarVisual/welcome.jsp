@@ -28,14 +28,11 @@
                 路径生成模块
             </h3>
             <p>
-                选择“选取坐标点”按钮，鼠标在图上点击以选取目标路径点（最多可以选择10个）<br>
-                选择“生成路径”按钮，生成巡检路径。<br>
-                选择“重新选取”按钮，清除之前选点重新进行选取。
+                选择“选取坐标点”按钮，鼠标在图上点击以选取目标路径点。<br>
+                选择“生成路径”按钮，生成巡检路径。
             </p>
             <button type="button" id="selectgps"  onclick="selectgps()" class="btn btn-default btn-primary btn-block">选取坐标点</button>
             <button type="button" id="newroute" onclick="newroute()" class="btn btn-default btn-block btn-primary">生成路径</button>
-            <button type="button" id="reselect" onclick="reselect()" class="btn btn-default btn-block btn-primary">重新选取</button>
-
         </div>
         <div class="col-md-6 column" id="allmap">
         </div>
@@ -84,9 +81,18 @@
     var car_connect="Disconnecting";
     var car_marker;
     var car_point;
+    var route_marker;
     var route_points=[];
-    var driving = new BMap.WalkingRoute(map, {renderOptions:{map: map, autoViewport: true}});
-
+    var driving = new BMap.WalkingRoute(map, {renderOptions:{map: map, autoViewport: true},
+        onPolylinesSet:function(routes) {
+            searchRoute = routes[0].getPolyline();//导航路线
+            map.removeOverlay(searchRoute);
+        },
+        onMarkersSet:function(routes) {
+            map.removeOverlay(routes[0].marker); //删除起点
+            map.removeOverlay(routes[1].marker);//删除终点
+        }
+    });
     //jquery实现AJAX;
     function ink(){
         $.ajax({
@@ -181,6 +187,10 @@
     //         });
     // });
     function selectgps(){
+        driving.clearResults();
+        map.clearOverlays();
+        map.addOverlay(car_marker);
+        route_points=[];
         if (car_longitude==""||car_latitude==""||car_longitude=="nan"||car_latitude=="nan"){
             document.getElementById("alert").innerHTML="<h4>No GPS location information! </h4> <strong>警告：未获取无人车GPS定位信息！</strong>"
         }
@@ -192,19 +202,28 @@
         var length  = route_points.length;
         if(length==0){
             document.getElementById("alert").innerHTML="<h4>No points selected! </h4> <strong>警告：坐标点未选取！</strong>"
-        }else if(length>10){
-            document.getElementById("alert").innerHTML="<h4>Total number of points is limited to 10! </h4> <strong>警告：坐标点总数不能超过十个！</strong>"
         }else{
-            var destination_point = route_points[length-1];
-            var way_points=route_points.slice(0,length-1);
-            driving.search(car_point, destination_point,{waypoints:way_points});
+            document.getElementById("alert").innerHTML="<h4>Route has been created! </h4> <strong>路径已生成！</strong>"
+            for(var i=0;i<length;i++){
+                if (i==0){
+                    driving.search(car_point, route_points[i]);
+                }else{
+                    driving.search(route_points[i-1],route_points[i]);
+                }
+            }
+            driving.setSearchCompleteCallback(function () {
+                var pts = driving.getResults().getPlan(0).getRoute(0).getPath();    //通过步行实例，获得一系列点的数组
+                var polyline = new BMap.Polyline(pts,{strokeColor:"red"});
+                map.addOverlay(polyline);
+            }
+            )
+            var des_icon=new BMap.Icon("image/destination.png", new BMap.Size(30,30));
+            route_marker.setIcon(des_icon);
+            map.removeEventListener("click", showInfo);
+            // var destination_point = route_points[length-1];
+            // var way_points=route_points.slice(0,length-1);
+            // driving.search(car_point, route_points[i]);
         }
-    }
-    function reselect() {
-        driving.clearResults();
-        map.clearOverlays();
-        map.addOverlay(car_marker);
-        route_points=[];
     }
 
 </script>
